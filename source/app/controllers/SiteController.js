@@ -58,7 +58,8 @@ class SiteController {
 
     async getCart(req, res) {
         var data = await CartM.getCart(req.body.userID);
-        res.send({data: data});
+        console.log(data);
+        res.send({data: data.rows});
     }
     async addToCart(req, res) {
 

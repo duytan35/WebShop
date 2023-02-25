@@ -2,9 +2,9 @@ const pool = require('../../configs/index.js');
 
 class Cart {
     async getCart (userID) {
-        var data = await pool.query(`SELECT "UserID", "ProductID", "dateAdd"
-                                            FROM public."Cart"
-                                            WHERE "UserID"=${userID};`)
+        var data = await pool.query(`SELECT * FROM public."Cart" c
+                                            join public."Products" p on c."ProductID"=p."ProductID"
+                                            WHERE c."UserID"=${userID};`)
         return data;
     }
     async Add (userID, productID) {
