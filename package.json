@@ -1,0 +1,36 @@
+{
+    "name": "week7",
+    "version": "1.0.0",
+    "description": "",
+    "main": "source/index.js",
+    "scripts": {
+        "start": "nodemon --inspect source/serverAuth.js",
+        "dev": "concurrently --kill-others \"npm run auth-server\" \"npm run shop-server\"",
+        "auth-server": "nodemon --inspect source/serverAuth.js",
+        "shop-server": "nodemon --inspect source/serverShop.js",
+        "watch": "node-sass --watch source/resources/scss/ -o source/public/css/",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "bcrypt": "^5.1.0",
+        "body-parser": "^1.20.1",
+        "cookie-parser": "^1.4.6",
+        "cors": "^2.8.5",
+        "crypto-js": "^4.1.1",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "express-handlebars": "^6.0.6",
+        "express-session": "^1.17.3",
+        "jsonwebtoken": "^9.0.0",
+        "passport": "^0.6.0",
+        "pg": "^8.8.0"
+    },
+    "devDependencies": {
+        "concurrently": "^7.6.0",
+        "morgan": "^1.10.0",
+        "node-sass": "^8.0.0",
+        "nodemon": "^2.0.20"
+    }
+}

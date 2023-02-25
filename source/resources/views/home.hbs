@@ -1,0 +1,163 @@
+<nav class="header headerGreet navbar bg-light">
+    <div class="container-fluid">
+        <h3 id="textGreet"></h3>
+        <button id="btnLogout" class="btn btn-outline-success">Logout</button>
+    </div>
+</nav>
+
+<nav class="header navbar bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="http://localhost:20574/home">Shop</a>
+        <form class="form_search" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+    </div>
+</nav>
+
+<div class="row">
+    <div class="col-12">
+        <nav class="navbar navbar-expand-lg bg-light mt-3 mb-3 p-2">
+            <div id="nav">
+                {{#each Name_Categories}}
+                <a id="CatID{{CategoryID}}" class="navbar-brand">{{CategoryName}}</a>
+                {{/each}}
+                <i id="cartIcon">
+                    <i class="fa-solid fa-cart-shopping fa-2x"></i>
+                    <div id="cart">
+                        <div>11232</div>
+                        <div>2</div>
+                    </div>
+                </i>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<div class="row" style="margin-left: 0px; margin-right: 0px;">
+    <div class="col-12">
+        <div class="row row-cols-1 row-cols-md-4" style="background-color: #F5F5FA;">
+            {{#each Products}}
+            <div class="col mb-2 mt-2" id="{{this.ProductID}}">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{this.ProductName}}</h5>
+                        <strong>
+                            <p>Price: {{this.UnitPrice}}</p>
+                        </strong>
+                        <strong>
+                            <p>In Stock: {{this.UnitsInStock}}</p>
+                        </strong>
+                        <button id="btn_{{this.ProductID}}" class="btn_add">Add to cart</button>
+                    </div>
+                </div>
+            </div>
+
+            {{/each}}
+        </div>
+    </div>
+</div>
+
+<script>
+    var fullName = getCookie('fullName');
+    textGreet.innerHTML = 'Hello, ' + fullName;
+
+    btnLogout.addEventListener('click', function (e) {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i];
+            const eqPos = cookie.indexOf("=");
+            const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+            document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            window.location.href = "/login";
+        }
+    })
+
+    var url = document.URL;
+    var catNum = url.slice(url.length - 1);
+    var nav = document.querySelector('#nav');
+    if (catNum > 0) {
+        nav.children[catNum - 1].style.color = 'blue'
+    }
+
+
+    for (let i = 0; i < nav.children.length; i++) {
+        var idCat = nav.children[i].id.slice(5);
+        var href = '/home/' + idCat;
+        SetLinkCat(nav.children[i], href);
+    }
+    function SetLinkCat(element, href) {
+        element.addEventListener('click', (e) => {
+            window.location.href = href;
+        })
+    }
+
+    var btn_adds = document.querySelectorAll('.btn_add');
+    for (btn_add of btn_adds) {
+        SetAddToCat(btn_add, btn_add.id);
+    }
+
+    function SetAddToCat(btn_add, proID) {
+        btn_add.addEventListener('click', async e => {
+            if (await !Verify()) {
+                window.location.href = "/login";
+            }
+            else {
+                var mess = `Add '${btn_add.parentNode.children[0].innerHTML}'' to cart successfully`;
+                alert(mess);
+            }
+        })
+    }
+
+    function getCart() {
+        fetch("http://localhost:20574/home/getCart", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userID: getCookie('userID') }),
+        })
+            .then(response => response.json())
+            .then(rs => {
+                console.log(rs)
+            });
+    }
+    getCart();
+
+    async function Verify() {
+        var token = "";
+        if (document.cookie.search('refresh-token') == -1 && document.cookie.search('token')) {
+            alert('You are not logged in');
+            window.location.href = "/login";
+        }
+        else if (document.cookie.search('refresh-token') != -1) {
+            token = getCookie('refresh-token');
+        }
+        else {
+            token = getCookie('token');
+        }
+        fetch("https://localhost:3113/verify", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ token: token }),
+        })
+            .then(response => response.json())
+            .then(rs => {
+                if (rs.result == false) {
+                    alert('You are not logged in');
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
+    }
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+</script>

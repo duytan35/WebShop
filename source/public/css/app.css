@@ -1,0 +1,96 @@
+.headerGreet{
+  margin: 10px 0px;
+}
+
+.headerGreet h3{
+  width: 100%;
+  text-align: center;
+}
+
+#btnLogout{
+  position: absolute;
+  right: 10px;
+}
+
+.header{
+  border-radius: 10px;
+}
+
+.navbar-expand-lg{
+  border-radius: 10px;
+}
+
+.row-cols-1{
+  border-radius: 10px;
+}
+
+.container-fluid .navbar-brand{
+  font-weight: 500;
+  font-size: 22px;
+}
+
+.container-fluid .navbar-brand:hover{
+  opacity: 0.8;
+}
+
+.form_search{
+  display: flex;
+  margin-bottom: 0px;
+}
+
+#nav{
+  width: 100%;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: center;
+}
+
+#nav a{
+  margin-right: 0px;
+  padding: 0px 10px;
+}
+
+#nav a:hover{
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+#cartIcon{
+  flex: 1;
+  text-align: end;
+  width: 40px;
+  position: relative;
+}
+
+#cartIcon:hover #cart{
+  display: block;
+}
+
+#cart{
+  text-align: left;
+  z-index: 1;
+  position: absolute;
+  top: 40px;
+  right: 0px;
+  width: 300px;
+  min-height: 100px;
+  background-color: #C1C1C1;
+  border-radius: 10px;
+  display: none;
+}
+
+#cart::after{
+  width: 30px;
+  content: '▲';
+  text-align: center;
+  size: 20px;
+  color: #C1C1C1;
+  position: absolute;
+  right: 0px;
+  top: -16px;
+  border-width: 20px;
+  border-color: black black black black;
+}
+
