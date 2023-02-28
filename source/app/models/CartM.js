@@ -7,13 +7,19 @@ class Cart {
                                             WHERE c."UserID"=${userID};`)
         return data;
     }
-    async Add (userID, productID) {
-        var categories = await pool.query(`SELECT * FROM public."Categories" ORDER BY "CategoryID" ASC `)
-        return categories;
+    async addNotExist (userID, productID) {
+        await pool.query(`INSERT INTO public."Cart"(
+                        "UserID", "ProductID", "Amount")
+                        VALUES (${userID}, ${productID}, 1);`)
+    }
+    async addExist (userID, productID, amount) {
+        await pool.query(`UPDATE public."Cart"
+                        SET "Amount"=${amount}
+                        WHERE "ProductID"=${productID} and "UserID"=${userID}; `)
     }
     async Delete (userID, productID) {
-        var categories = await pool.query(`SELECT * FROM public."Categories" ORDER BY "CategoryID" ASC `)
-        return categories;
+        await pool.query(`DELETE FROM public."Cart"
+                        WHERE "ProductID"=${productID} and "UserID"=${userID};`)
     }
 }
 

@@ -58,11 +58,17 @@ class SiteController {
 
     async getCart(req, res) {
         var data = await CartM.getCart(req.body.userID);
-        console.log(data);
         res.send({data: data.rows});
     }
-    async addToCart(req, res) {
 
+    async addToCart(req, res) {
+        console.log(req.body);
+        if(req.body.isExist){
+            await CartM.addExist (req.body.userID, req.body.ProductID, req.body.amount);
+        }
+        else {
+            await CartM.addNotExist (req.body.userID, req.body.ProductID);
+        }
     }
     async deleteToCart(req, res) {
         

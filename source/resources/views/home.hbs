@@ -54,7 +54,6 @@
                     </div>
                 </div>
             </div>
-
             {{/each}}
         </div>
     </div>
@@ -63,6 +62,8 @@
 <script>
     var fullName = getCookie('fullName');
     textGreet.innerHTML = 'Hello, ' + fullName;
+
+    var userID = getCookie('userID');
 
     btnLogout.addEventListener('click', function (e) {
         const cookies = document.cookie.split(";");
@@ -94,20 +95,74 @@
     }
 
     var btn_adds = document.querySelectorAll('.btn_add');
-    for (btn_add of btn_adds) {
-        SetAddToCat(btn_add, btn_add.id);
-    }
 
-    function SetAddToCat(btn_add, proID) {
+    function SetAddToCat(btn_add, proID, data) {
         btn_add.addEventListener('click', async e => {
             if (await !Verify()) {
                 window.location.href = "/login";
             }
             else {
                 var mess = `Add '${btn_add.parentNode.children[0].innerHTML}'' to cart successfully`;
+                let flag = false;
+                let amount = 0;
+                for (product of data) {
+                    if (product.ProductID == proID.slice(4)) {
+                        product.Amount += 1;
+                        amount = product.Amount;
+                        flag = true;
+                        break;
+                    }
+                }
+                if (!flag) {
+                    let newProduct = {
+                        UserID: userID,
+                        ProductName: btn_add.parentNode.children[0].innerHTML,
+                        ProductID: proID.slice(4),
+                        Amount: 1
+                    }
+                    data.push(newProduct);
+                }
+                fetch("http://localhost:20574/home/addCart", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userID: getCookie('userID'), ProductID: proID.slice(4), isExist: flag, amount: amount }),
+                })
+                renderCart(data);
                 alert(mess);
             }
         })
+    }
+
+    function renderCart(data) {
+        while (cart.firstChild) {
+            cart.removeChild(cart.lastChild);
+        }
+        for (product of data) {
+            var htmlDiv = document.createElement("div");
+            var name = document.createElement("p");
+            var amount = document.createElement("p");
+            var btnCheckout = document.createElement("button");
+            var btnDelete = document.createElement("button");
+            name.innerHTML = product.ProductName;
+            amount.innerHTML = product.Amount;
+            btnCheckout.innerHTML = "Checkout"
+            btnDelete.innerHTML = "Delete"
+            btnDelete.id = `delete_${product.ProductID}`
+            btnDelete.className = "deleteProduct"
+            htmlDiv.classList.add("productInCart")
+            btnCheckout.classList.add("btnCheckout")
+            htmlDiv.appendChild(name);
+            htmlDiv.appendChild(amount);
+            htmlDiv.appendChild(btnCheckout);
+            htmlDiv.appendChild(btnDelete);
+            btnDelete.href = '/';
+            btnDelete.addEventListener("click", (e) => {
+                cart.removeChild(btnDelete.parentElement);
+            })
+            cart.appendChild(htmlDiv);
+        }
     }
 
     function getCart() {
@@ -120,26 +175,10 @@
         })
             .then(response => response.json())
             .then(rs => {
-                console.log(rs.data);
-                for (product of rs.data) {
-                    console.log(product);
-                    var htmlDiv = document.createElement("div");
-                    var name = document.createElement("p");
-                    var amount = document.createElement("p");
-                    var btnCheckout = document.createElement("button");
-                    var btnDelete = document.createElement("button");
-                    name.innerHTML = product.ProductName;
-                    amount.innerHTML = product.Amount;
-                    btnCheckout.innerHTML = "Checkout"
-                    btnDelete.innerHTML = "Delete"
-                    htmlDiv.classList.add("productInCart")
-                    btnCheckout.classList.add("btnCheckout")
-                    htmlDiv.appendChild(name);
-                    htmlDiv.appendChild(amount);
-                    htmlDiv.appendChild(btnCheckout);
-                    htmlDiv.appendChild(btnDelete);
-                    cart.appendChild(htmlDiv);
+                for (btn_add of btn_adds) {
+                    SetAddToCat(btn_add, btn_add.id, rs.data);
                 }
+                renderCart(rs.data);
             });
     }
     getCart();
