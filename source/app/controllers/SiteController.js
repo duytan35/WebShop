@@ -56,6 +56,12 @@ class SiteController {
         res.render("home", {Name_Categories: Categories.rows, Products: Products.rows});
     }
 
+    async searchProducts(req, res) {
+        var Categories = await CategoryM.getAllCategory();
+        var Products = await ProductM.fillProductByName(req.query.name);
+        res.render("home", {Name_Categories: Categories.rows, Products: Products.rows});
+    }
+
     async getCart(req, res) {
         var data = await CartM.getCart(req.body.userID);
         res.send({data: data.rows});
@@ -71,7 +77,7 @@ class SiteController {
         }
     }
     async deleteToCart(req, res) {
-        
+        await CartM.Delete(req.body.userID, req.body.ProductID)
     }
 }
 

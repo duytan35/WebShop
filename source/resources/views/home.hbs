@@ -8,9 +8,10 @@
 <nav class="header navbar bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="http://localhost:20574/home">Shop</a>
-        <form class="form_search" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Search</button>
+        <form class="form_search" role="search" action="/home/search">
+            <input id="inputSearch" class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                name="name">
+            <button id="btnSearch" class="btn btn-outline-success" type="submit">Search</button>
         </form>
     </div>
 </nav>
@@ -43,14 +44,18 @@
             <div class="col mb-2 mt-2" id="{{this.ProductID}}">
                 <div class="card h-100">
                     <div class="card-body">
-                        <h5 class="card-title">{{this.ProductName}}</h5>
+                        <h5 class="card-title" style="text-align: center;">{{this.ProductName}}</h5>
                         <strong>
                             <p>Price: {{this.UnitPrice}}</p>
                         </strong>
                         <strong>
                             <p>In Stock: {{this.UnitsInStock}}</p>
                         </strong>
-                        <button id="btn_{{this.ProductID}}" class="btn_add">Add to cart</button>
+                        <img src="https://loremflickr.com/320/240/dog/" style="width: 100%;" />
+                        <button id="btn_{{this.ProductID}}" class="btn_add"
+                            style="background-color: #F5F5FA; border-radius: 5px; margin-top: 10px; width: 100%">Add
+                            to
+                            cart</button>
                     </div>
                 </div>
             </div>
@@ -76,6 +81,10 @@
         }
     })
 
+    btnSearch.addEventListener("click", e => {
+        console.log("Search")
+    })
+
     var url = document.URL;
     var catNum = url.slice(url.length - 1);
     var nav = document.querySelector('#nav');
@@ -83,7 +92,7 @@
         nav.children[catNum - 1].style.color = 'blue'
     }
 
-    for (let i = 0; i < nav.children.length; i++) {
+    for (let i = 0; i < nav.children.length - 1; i++) {
         var idCat = nav.children[i].id.slice(5);
         var href = '/home/' + idCat;
         SetLinkCat(nav.children[i], href);
@@ -93,6 +102,7 @@
             window.location.href = href;
         })
     }
+
 
     var btn_adds = document.querySelectorAll('.btn_add');
 
@@ -135,6 +145,19 @@
         })
     }
 
+    function setDeleteFromCart(btnDelete, productID) {
+        btnDelete.addEventListener("click", (e) => {
+            cart.removeChild(btnDelete.parentElement);
+            fetch("http://localhost:20574/home/deleteCart", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userID: getCookie('userID'), ProductID: productID }),
+            })
+        })
+    }
+
     function renderCart(data) {
         while (cart.firstChild) {
             cart.removeChild(cart.lastChild);
@@ -157,10 +180,7 @@
             htmlDiv.appendChild(amount);
             htmlDiv.appendChild(btnCheckout);
             htmlDiv.appendChild(btnDelete);
-            btnDelete.href = '/';
-            btnDelete.addEventListener("click", (e) => {
-                cart.removeChild(btnDelete.parentElement);
-            })
+            setDeleteFromCart(btnDelete, product.ProductID);
             cart.appendChild(htmlDiv);
         }
     }
